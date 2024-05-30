@@ -2,7 +2,12 @@ Tooling to build the jdk22 HotSpot hsdis disassembler with nix.
 
 # Example
 
-Compile and run with:
+Build a development environment with hsdis and jdk22 with:
+```
+nix develop
+```
+
+Then compile and run some java code with:
 ```
 $ javac Main.java
 $ java -Xbatch '-XX:-TieredCompilation' '-XX:CompileCommand=dontinline,Main::add*' '-XX:CompileCommand=PrintAssembly,Main::add*' Main
