@@ -10,6 +10,8 @@
       pkgs = (inputs.nixpkgs.legacyPackages.${system}.extend overlay);
     in
     {
+      packages.${system}.default = pkgs.jdk22;
+
       devShell.${system} = pkgs.mkShell rec {
         name = "java-shell";
         buildInputs = with pkgs; [ jdk22 llvm ];
