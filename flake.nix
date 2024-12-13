@@ -5,7 +5,7 @@
 
   outputs = inputs:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" ];
+      supportedSystems = [ "x86_64-linux" ];
 
       overlay = import ./overlays/default.nix;
 
