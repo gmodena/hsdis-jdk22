@@ -5,21 +5,42 @@
 
   outputs = inputs:
     let
-      system = "x86_64-linux";
+      supportedSystems = [ "x86_64-linux" "aarch64-darwin" "x86_64-darwin" ];
+
       overlay = import ./overlays/default.nix;
-      pkgs = (inputs.nixpkgs.legacyPackages.${system}.extend overlay);
+
+      forAllSystems = f: builtins.listToAttrs (
+        map (system: {
+          name = system;
+          value = f system;
+        }) supportedSystems
+      );
+
     in
     {
-      packages.${system}.default = pkgs.jdk22;
+      packages = forAllSystems (system: 
+        let
+          pkgs = (inputs.nixpkgs.legacyPackages.${system}.extend overlay);
+        in
+          {
+            inherit (pkgs) jdk22;
+          }
+      );
 
-      devShell.${system} = pkgs.mkShell rec {
-        name = "java-shell";
-        buildInputs = with pkgs; [ jdk22 llvm ];
+      devShell = forAllSystems (system: 
+        let
+          pkgs = (inputs.nixpkgs.legacyPackages.${system}.extend overlay);
+        in
+          pkgs.mkShell rec {
+            name = "java-shell";
+            buildInputs = with pkgs; [ jdk22 llvm ];
 
-        shellHook = ''
-          export JAVA_HOME=${pkgs.jdk22}
-          PATH="${pkgs.jdk22}/bin:$PATH"
-        '';
-      };
+            shellHook = ''
+              export JAVA_HOME=${pkgs.jdk22}
+              PATH="${pkgs.jdk22}/bin:$PATH"
+            '';
+          }
+      );
     };
 }
+
